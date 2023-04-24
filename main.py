@@ -1,6 +1,11 @@
 import imaplib
 import email
 import re
+import sys
+import socket
+
+socket.setdefaulttimeout(4) # Set socket default timeout
+
 
 IMAPserver = "<--imap-server-->"
 IMAPuser = "<--imap-username-->"
@@ -13,11 +18,12 @@ def connect(server, user, password):
       m = imaplib.IMAP4_SSL(server)
       m.login(user, password)
     except Exception as e:
-      print(str(e))
+      print("IMAP Connection Error:",str(e).replace("b'",""))
+      sys.exit()
     else:
       print("connected sucessfully, scraping email")
       m.select(IMAPfolderName) # Look at e-mails in folder URLs
-    
+   
     return m
 
 def scrape_email_for_URLs(con,emailid):
@@ -35,7 +41,7 @@ def scrape_email_for_URLs(con,emailid):
     urlRegex = "https?:\/\/[A-z-./&?=0-9]{0,2048}"
 
     urls = re.findall(urlRegex, str(email_text_body),re.IGNORECASE|re.MULTILINE)
-    print("Found",len(urls),"URLs in e-mail",emailid)
+    print("Found",len(urls),"URLs in e-mail",emailid.decode('utf-8'))
     if len(urls) > 0:
         result = set(urls) # remove duplicates by changing from list to set as we're looking at both 'text/plain' and 'text/html'
     else:
@@ -49,10 +55,10 @@ def get_unseen_emails(imapserver:str=IMAPserver,username:str=IMAPuser,password:s
     resp, items = con.search(None, "UnSeen")
     
     items = items[0].split()
-    print("Found",len(items),"unseen e-mails")
+    print("Found",len(items),"unseen e-mails in IMAP folder",f"\{IMAPfolderName}:")
 
     for emailid in items:
-        emailResults[emailid] = scrape_email_for_URLs(con, emailid)
+        emailResults[emailid.decode('utf-8')] = scrape_email_for_URLs(con, emailid)
     
     con.close
     return emailResults
