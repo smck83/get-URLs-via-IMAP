@@ -7,7 +7,7 @@ Run this script against an IMAP mailbox.
 Sample output
 
 ````
-onnected sucessfully, scraping email
+Connected sucessfully, scraping email
 Found 4 unseen e-mails
 Found 5 URLs in e-mail b'1'
 Found 0 URLs in e-mail b'2'
