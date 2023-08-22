@@ -4,7 +4,7 @@ This is a docker container that uses a python script to connect to an IMAP mailb
 
 Run the docker container
 ````
-docker run -it -e IMAP_SERVER=<--IP-OR-HOST--> -e IMAP_USERNAME=<--USERNAME--> -e IMAP_PASSWORD=<--PASSWORD-->
+docker run -it -e IMAP_SERVER=<--IP-OR-HOST--> -e IMAP_USERNAME=<--USERNAME--> -e IMAP_PASSWORD=<--PASSWORD--> smck83/click-urls-via-imap
 ````
 
 Sample output
