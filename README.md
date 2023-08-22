@@ -1,6 +1,6 @@
 # get-URLs-via-IMAP
---This sample python script will connect to an IMAP mailbox and collect all URL's from Unseen e-mails in the 'URLs' folder--
-
+~~This sample python script will connect to an IMAP mailbox and collect all URL's from Unseen e-mails in the 'URLs' folder~~
+This is a docker container that uses a python script to connect to an IMAP mailbox and search for all URL's in the e-mail and click (requests.get) them.
 
 Run this script against an IMAP mailbox.
 
