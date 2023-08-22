@@ -2,15 +2,27 @@ import imaplib
 import email
 import re
 import sys
-import socket
+#import socket
+import requests
+import time
+import os
 
-socket.setdefaulttimeout(4) # Set socket default timeout
+#socket.setdefaulttimeout(4) # Set socket default timeout
 
-
-IMAPserver = "<--imap-server-->"
-IMAPuser = "<--imap-username-->"
-IMAPpassword = "<--imap-password-->"
-IMAPfolderName= "URLs" # Set this to a folder you which to target, e.g. it could be Inbox
+if 'IMAP_SERVER' in os.environ:
+    IMAPserver = os.environ['IMAP_SERVER']
+if 'IMAP_USERNAME' in os.environ:
+    IMAPuser = os.environ['IMAP_USERNAME']
+if 'IMAP_PASSWORD' in os.environ:
+    IMAPpassword = os.environ['IMAP_PASSWORD']
+if 'DELAY' in os.environ:
+    delay = int(os.environ['DELAY'])
+else:
+   delay = 30
+if 'IMAP_FOLDER' in os.environ:
+    IMAPfolderName = os.environ['IMAP_FOLDER']
+else:
+   IMAPfolderName = 'Inbox'
 
 # Connect to an IMAP server
 def connect(server, user, password):
@@ -41,13 +53,15 @@ def scrape_email_for_URLs(con,emailid):
     urlRegex = "https?:\/\/[A-z-./&?=0-9]{0,2048}"
 
     urls = re.findall(urlRegex, str(email_text_body),re.IGNORECASE|re.MULTILINE)
-    print("Found",len(urls),"URLs in e-mail",emailid.decode('utf-8'))
-    if len(urls) > 0:
-        result = set(urls) # remove duplicates by changing from list to set as we're looking at both 'text/plain' and 'text/html'
-    else:
-        result = {}
-    
-    return result
+    for url in urls:
+      print(url)
+      try:
+        webrequest = requests.get(url)
+      except Exception as e:
+         print(url,e)
+      else:
+        print(url,":",webrequest.status_code)
+
 
 def get_unseen_emails(imapserver:str=IMAPserver,username:str=IMAPuser,password:str=IMAPpassword):
     emailResults = {}
@@ -58,14 +72,14 @@ def get_unseen_emails(imapserver:str=IMAPserver,username:str=IMAPuser,password:s
     print("Found",len(items),"unseen e-mails in IMAP folder",f"\{IMAPfolderName}:")
 
     for emailid in items:
+        con.store(emailid, '+FLAGS', '(\\Seen)')  ## Mark the e-mail as read so it won't be printed again
         emailResults[emailid.decode('utf-8')] = scrape_email_for_URLs(con, emailid)
-    
+
     con.close
-    return emailResults
+    # return emailResults
 
-print(get_unseen_emails())
-
-
-
-
+while 1 != 0:
+    get_unseen_emails()
+    print("Sleeping for",delay,"seconds")
+    time.sleep(delay)
 
