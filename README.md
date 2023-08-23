@@ -7,6 +7,8 @@ Run the docker container
 docker run -it -e IMAP_SERVER=<--IP-OR-HOST--> -e IMAP_USERNAME=<--USERNAME--> -e IMAP_PASSWORD=<--PASSWORD--> smck83/click-urls-via-imap
 ````
 
+Other environment variables include `DELAY` which allows the frequency the script runs to be changed. Default is `30` seconds.
+
 Sample output
 
 ````
